@@ -7,12 +7,12 @@
 #include <iostream>
 #include <fstream>
 
-namespace simple {
-
 inline void PrintExit(const std::string &msg) {
   std::cerr << msg << std::endl;
   exit(-1);
 }
+
+namespace simple {
 
 inline void Write(std::fstream &f, void *s, std::streamsize n) {
   if (!f.write(reinterpret_cast<const char *>(s), n))
