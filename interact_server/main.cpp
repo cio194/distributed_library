@@ -7,6 +7,15 @@
 #include <string>
 
 std::string ProcessLine(const std::string &line) {
+  /**
+   * insert into book values ("book_name", "author_name", "publisher_name", "publish_time", "borrower_name", "borrower_time")
+   * select * from book where book_name="xxx"
+   * 暂定 select * from book where xxx(not book name)="xxx"
+   * 暂定 select * where book_name like "正则"
+   * 暂定 select * where borrower_time < "xxx"
+   * update book set borrower_name="xxx", borrow_time="xxx" where book_name="xxx"
+   * delete from book where book_name="xxx"
+   */
   return std::string("processed");
 }
 

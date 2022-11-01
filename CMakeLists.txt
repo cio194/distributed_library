@@ -7,3 +7,6 @@ add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(interact_server)
 add_subdirectory(logic_server)
+
+add_subdirectory(test/test_utils)
+add_subdirectory(test/unitest)
