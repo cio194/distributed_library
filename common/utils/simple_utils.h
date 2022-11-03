@@ -33,5 +33,20 @@ inline bool RegExists(const std::string &path) {
   return true;
 }
 
+inline bool DirExists(const std::string &dir) {
+  // 不存在
+  if (access(dir.c_str(), F_OK) != 0) return false;
+  // 存在但并非dir
+  struct stat sb;
+  if (lstat(dir.c_str(), &sb) != 0) throw unix_sys_error("lstat " + dir);
+  if (!S_ISDIR(sb.st_mode)) PrintExit(dir + " not dir");
+  // 存在
+  return true;
+}
+
+inline void Mkdir(const std::string &dir) {
+  if (mkdir(dir.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
+    throw unix_sys_error("mkdir " + dir);
+}
 
 #endif //BP_TREE_DISK_SIMPLE_UTILS_H

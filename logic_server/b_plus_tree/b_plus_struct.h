@@ -20,6 +20,7 @@ struct BP {
   static constexpr int kMaxKeySize = 512;
   static constexpr int kMaxEntrySize = 4096;
   static constexpr int kCacheNum = 64;
+  static constexpr int kMaxReturn = 10;
   // 结点类型
   static constexpr uint32_t kInternal = 0;
   static constexpr uint32_t kLeaf = 1;
