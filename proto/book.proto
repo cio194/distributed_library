@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package book;
+
+service Table {
+  rpc Insert (Book) returns (RetCode);
+
+  rpc Delete (BookName) returns (RetCode);
+}
+
+message Book {
+  string name = 1;
+  string author = 2;
+  string publisher = 3;
+  string publish_date = 4;
+  string borrower = 5;
+  string borrow_date = 6;
+}
+
+message RetCode {
+  sint32 code = 1;
+}
+
+message BookName {
+  string name = 1;
+}

@@ -1,5 +1,7 @@
 project(interact_server)
 
+include(../proto/grpc.cmake)
+
 # 收集源文件
 FILE(GLOB_RECURSE ALL_SRC CONFIGURE_DEPENDS *.cpp *.h)
 FILE(GLOB MAIN_SRC main.cpp)
@@ -10,7 +12,8 @@ FOREACH (F ${ALL_SRC})
 ENDFOREACH (F)
 
 # 指定库
-SET(LIBRARIES common)
+SET(LIBRARIES common book_grpc_proto ${_REFLECTION}
+        ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 
 # 可执行文件
 add_executable(${PROJECT_NAME} ${ALL_SRC})
