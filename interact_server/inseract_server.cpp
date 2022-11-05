@@ -1,11 +1,13 @@
 #include "inseract_server.h"
 
-InteractServer::InteractServer(
-    uint16_t interact_port, const std::string &rpc_target)
-    : kInteractPort_(interact_port),
-      client_(
-          grpc::CreateChannel(rpc_target, grpc::InsecureChannelCredentials())
-      ) {}
+InteractServer::InteractServer(uint16_t interact_port,
+                               const std::vector<std::string> &rpc_targets)
+    : kInteractPort_(interact_port) {
+  for (const auto &rpc_target : rpc_targets) {
+    clients_.emplace_back(grpc::CreateChannel(
+        rpc_target, grpc::InsecureChannelCredentials()));
+  }
+}
 
 void InteractServer::Run() {
   int listenfd, connfd;
@@ -74,7 +76,7 @@ std::string InteractServer::ProcessLine(const std::string &line) {
       return kBadLine;
     }
     // 执行
-    return client_.Insert(Book::ToProto(b));
+    return Shard(b.name).Insert(Book::ToProto(b));
 
   } else if (strncmp(line.c_str(), "delete", 6) == 0) {
     // 解析
@@ -85,7 +87,7 @@ std::string InteractServer::ProcessLine(const std::string &line) {
     // 执行
     book::BookName bookname;
     bookname.set_name(name);
-    return client_.Delete(bookname);
+    return Shard(name).Delete(bookname);
 
   } else if (strncmp(line.c_str(), "update", 6) == 0) {
     // 解析
@@ -95,7 +97,7 @@ std::string InteractServer::ProcessLine(const std::string &line) {
       return kBadLine;
     }
     // 执行
-    return client_.Update(Book::ToProto(b));
+    return Shard(b.name).Update(Book::ToProto(b));
 
   } else if (strncmp(line.c_str(), "select", 6) == 0) {
     // 解析
@@ -106,9 +108,21 @@ std::string InteractServer::ProcessLine(const std::string &line) {
     // 执行
     book::BookName bookname;
     bookname.set_name(name);
-    return client_.Select(bookname);
+    return Shard(name).Select(bookname);
 
   } else {
     return kBadLine;
   }
+}
+
+TableClient &InteractServer::Shard(const char *name) {
+  // BKDR Hash Function
+  uint32_t seed = 131; // 31 131 1313 13131 131313 etc..
+  uint32_t hash = 0;
+  while (*name) hash = hash * seed + (*name++);
+  hash = hash & 0x7FFFFFFF;
+
+  auto idx = hash % df::kShardNum;
+  std::cout << "server " << idx << " handle request" << std::endl;
+  return clients_[idx];
 }

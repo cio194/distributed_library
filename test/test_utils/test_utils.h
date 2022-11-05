@@ -1,11 +1,8 @@
 #ifndef DISTRIBUTED_LIBRARY_TEST_UTILS_H
 #define DISTRIBUTED_LIBRARY_TEST_UTILS_H
 
-#define private public
-
 #include "utils/my_exceptions.h"
-#include "api/book.h"
-#include "table/table.h"
+#include "book/book.h"
 #include <vector>
 #include <string>
 #include <cstdlib>
@@ -15,6 +12,10 @@
 #include <set>
 #include <climits>
 #include <algorithm>
+
+#define private public
+
+#include "table/table.h"
 
 class TmpFiles {
   std::vector<std::string> files_;
