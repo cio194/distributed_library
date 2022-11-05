@@ -3,6 +3,7 @@
 
 #include "book.grpc.pb.h"
 #include "defs/defs.h"
+#include "book/book.h"
 
 #include <string>
 #include <memory>
@@ -20,7 +21,11 @@ public:
 
   std::string Insert(const book::Book &b);
 
-  std::string Delete(const book::BookName &name);
+  std::string Delete(const book::BookName &bookname);
+
+  std::string Update(const book::Book &b);
+
+  std::string Select(const book::BookName &bookname);
 
 private:
   std::unique_ptr<book::Table::Stub> stub_;

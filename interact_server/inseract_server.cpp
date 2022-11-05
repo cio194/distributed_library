@@ -65,9 +65,9 @@ void InteractServer::Run() {
 std::string InteractServer::ProcessLine(const std::string &line) {
   // 使用scanf进行简单解析
   static const std::string kBadLine = "bad command";
-  Book b;
   if (strncmp(line.c_str(), "insert", 6) == 0) {
     // 解析
+    Book b;
     if (sscanf(line.c_str(), Book::kInsertFormat,
                b.name, b.author, b.publisher, b.publish_date,
                b.borrower, b.borrow_date) == EOF) {
@@ -75,12 +75,39 @@ std::string InteractServer::ProcessLine(const std::string &line) {
     }
     // 执行
     return client_.Insert(Book::ToProto(b));
+
   } else if (strncmp(line.c_str(), "delete", 6) == 0) {
-    return "processed";
+    // 解析
+    char name[Book::kNameLen] = {0};
+    if (sscanf(line.c_str(), Book::kDeleteFormat, name) == EOF) {
+      return kBadLine;
+    }
+    // 执行
+    book::BookName bookname;
+    bookname.set_name(name);
+    return client_.Delete(bookname);
+
   } else if (strncmp(line.c_str(), "update", 6) == 0) {
-    return "processed";
+    // 解析
+    Book b;
+    if (sscanf(line.c_str(), Book::kUpdateFormat,
+               b.name, b.borrower, b.borrow_date) == EOF) {
+      return kBadLine;
+    }
+    // 执行
+    return client_.Update(Book::ToProto(b));
+
   } else if (strncmp(line.c_str(), "select", 6) == 0) {
-    return "processed";
+    // 解析
+    char name[Book::kNameLen] = {0};
+    if (sscanf(line.c_str(), Book::kSelectFormat, name) == EOF) {
+      return kBadLine;
+    }
+    // 执行
+    book::BookName bookname;
+    bookname.set_name(name);
+    return client_.Select(bookname);
+
   } else {
     return kBadLine;
   }

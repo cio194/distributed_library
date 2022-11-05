@@ -19,9 +19,9 @@ struct Book {
                                   kBorrowerLen + kDateLen;
   // 语句格式字符串，与上面常量有耦合关系
   static constexpr const char *const kInsertFormat = "insert %95s %63s %63s %15s %63s %15s";
-//  static const std::string kDelete;
-//  static const std::string kUpdate;
-//  static const std::string kSelect;
+  static constexpr const char *const kDeleteFormat = "delete %95s";
+  static constexpr const char *const kUpdateFormat = "update %95s set %63s %15s";
+  static constexpr const char *const kSelectFormat = "select %95s";
 
   char name[kNameLen] = {0};
   char author[kAuthorLen] = {0};
@@ -35,6 +35,8 @@ struct Book {
 
   static book::Book ToProto(const Book &b);
   static Book FromProto(const book::Book &proto);
+
+  static std::string ToPresent(const Book &b);
 
   static bool NameLess(const char *name1, const char *name2);
   static bool NameEqual(const char *name1, const char *name2);

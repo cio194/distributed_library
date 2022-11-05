@@ -6,6 +6,10 @@ service Table {
   rpc Insert (Book) returns (RetCode);
 
   rpc Delete (BookName) returns (RetCode);
+
+  rpc Update (Book) returns (RetCode);
+
+  rpc Select (BookName) returns (Book);
 }
 
 message Book {

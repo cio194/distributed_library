@@ -66,3 +66,19 @@ Book Book::FromProto(const book::Book &proto) {
   memcpy(b.borrow_date, proto.borrow_date().c_str(), proto.borrow_date().size() + 1);
   return b;
 }
+
+std::string Book::ToPresent(const Book &b) {
+  std::string str;
+  str.append(b.name);
+  str.push_back(' ');
+  str.append(b.author);
+  str.push_back(' ');
+  str.append(b.publisher);
+  str.push_back(' ');
+  str.append(b.publish_date);
+  str.push_back(' ');
+  str.append(b.borrower);
+  str.push_back(' ');
+  str.append(b.borrow_date);
+  return std::move(str);
+}

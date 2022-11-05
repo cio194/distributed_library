@@ -18,11 +18,26 @@ Table::Table() {
   }
 }
 
-int Table::Insert(const Book &book) {
-  auto entry = Book::ToStorage(book);
+int Table::Insert(const Book &b) {
+  auto entry = Book::ToStorage(b);
   return tree_->Insert(entry.c_str());
 }
 
 int Table::Delete(const std::string &name) {
   return tree_->Remove(name.c_str());
+}
+
+int Table::Update(const Book &b) {
+  if (Delete(b.name) != 0) return -1;
+  return Insert(b);
+}
+
+Book Table::Select(const std::string &name) {
+  std::string str;
+  int code = tree_->Search(name.c_str(), str);
+  if (code == 0) {
+    return Book::FromStorage(str.c_str());
+  } else {
+    return Book{};
+  }
 }
