@@ -1,0 +1,87 @@
+#include "inseract_server.h"
+
+InteractServer::InteractServer(
+    uint16_t interact_port, const std::string &rpc_target)
+    : kInteractPort_(interact_port),
+      client_(
+          grpc::CreateChannel(rpc_target, grpc::InsecureChannelCredentials())
+      ) {}
+
+void InteractServer::Run() {
+  int listenfd, connfd;
+  socklen_t clilen;
+  struct sockaddr_in cliaddr, servaddr;
+
+  listenfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (listenfd < 0) throw unix_sys_error("socket");
+
+  // 打开端口复用
+  int one = 1;
+  if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0)
+    throw unix_sys_error("setsockopt");
+
+  // 初始化服务器地址
+  bzero(&servaddr, sizeof(servaddr));
+  servaddr.sin_family = AF_INET;
+  servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  servaddr.sin_port = htons(kInteractPort_);
+  if (bind(listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
+    throw unix_sys_error("bind");
+
+  // 监听端口
+  if (listen(listenfd, 5) == -1) throw unix_sys_error("listen");
+
+  while (true) {
+    // 获取客户连接
+    clilen = sizeof(cliaddr);
+    connfd = accept(listenfd, (struct sockaddr *) &cliaddr, &clilen);
+    if (connfd == -1) {
+      if (errno == EINTR) continue;
+      else throw unix_sys_error("accept");
+    }
+    // 对客户连接进行处理（串行）
+    int readn = 0;
+    char read_buf[df::kMaxRequestLen];
+    std::string line;
+    while ((readn = read(connfd, read_buf, df::kMaxRequestLen)) > 0) {
+      // 读取到一行，进行处理
+      std::string result = ProcessLine(std::string(read_buf, readn));
+      int rn = result.size() < df::kMaxRequestLen ? result.size() : df::kMaxRequestLen;
+      write(connfd, result.c_str(), rn);
+    }
+    close(connfd);
+  }
+}
+
+/**
+  * insert into book values ("book_name", "author_name", "publisher_name", "publish_time", "borrower_name", "borrower_time")
+  * select * from book where book_name="xxx"
+  * 暂定 select * from book where xxx(not book name)="xxx"
+  * 暂定 select * where book_name like "正则"
+  * 暂定 select * where borrower_time < "xxx"
+  * update book set borrower_name="xxx", borrow_time="xxx" where book_name="xxx"
+  * delete from book where book_name="xxx"
+  */
+std::string InteractServer::ProcessLine(const std::string &line) {
+  // 使用scanf进行简单解析
+  static const std::string kBadLine = "bad command";
+  Book b;
+  if (strncmp(line.c_str(), "insert", 6) == 0) {
+    // 解析
+    if (sscanf(line.c_str(), Book::kInsertFormat,
+               b.name, b.author, b.publisher, b.publish_date,
+               b.borrower, b.borrow_date) == EOF) {
+      return kBadLine;
+    }
+    // 执行
+    return client_.Insert(Book::ToProto(b));
+  } else if (strncmp(line.c_str(), "delete", 6) == 0) {
+    return "processed";
+  } else if (strncmp(line.c_str(), "update", 6) == 0) {
+    return "processed";
+  } else if (strncmp(line.c_str(), "select", 6) == 0) {
+    return "processed";
+  } else {
+    return kBadLine;
+  }
+}

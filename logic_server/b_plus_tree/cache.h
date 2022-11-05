@@ -1,8 +1,8 @@
 #ifndef BP_TREE_DISK_NODE_CACHE_H
 #define BP_TREE_DISK_NODE_CACHE_H
 
-#include "utils/simple_utils.h"
-#include "utils/custom_exceptions.h"
+#include "utils/utils.h"
+#include "utils/my_exceptions.h"
 #include "b_plus_struct.h"
 #include "lru.h"
 #include <unistd.h>

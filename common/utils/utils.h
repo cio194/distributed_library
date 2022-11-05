@@ -1,7 +1,7 @@
 #ifndef BP_TREE_DISK_SIMPLE_UTILS_H
 #define BP_TREE_DISK_SIMPLE_UTILS_H
 
-#include "custom_exceptions.h"
+#include "my_exceptions.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <string>

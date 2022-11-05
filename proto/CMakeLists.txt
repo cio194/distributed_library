@@ -21,6 +21,11 @@ add_custom_command(
         "${book_proto}"
         DEPENDS "${book_proto}")
 
+# book_proto
+add_library(book_proto ${book_proto_srcs} ${book_proto_hdrs})
+target_link_libraries(book_proto ${_PROTOBUF_LIBPROTOBUF})
+target_include_directories(book_proto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
 # book_grpc_proto
 add_library(book_grpc_proto
         ${book_grpc_srcs}

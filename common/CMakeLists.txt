@@ -1,6 +1,12 @@
-file(GLOB_RECURSE sources CONFIGURE_DEPENDS *.cpp *.h)
+project(common)
 
-add_library(common STATIC)
-target_sources(common PUBLIC ${sources})
-target_include_directories(common PUBLIC .)
-set_target_properties(common PROPERTIES LINKER_LANGUAGE CXX)
+# 收集源文件
+FILE(GLOB_RECURSE ALL_SRC CONFIGURE_DEPENDS *.cpp *.h)
+
+# 指定库
+SET(LIBRARIES book_proto)
+
+add_library(${PROJECT_NAME} STATIC ${ALL_SRC})
+target_include_directories(${PROJECT_NAME} PUBLIC .)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
